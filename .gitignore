@@ -1,0 +1,32 @@
+# Data layers: raw and derived data never go in git (manifests do)
+bronze/**
+!bronze/.gitkeep
+!bronze/manifest.csv
+silver/
+gold/
+*.zip
+*.csv.gz
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Secrets and local settings
+.env
+*.env
+local.settings.json
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# OS / editor
+.DS_Store
+.vscode/

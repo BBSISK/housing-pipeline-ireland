@@ -1,0 +1,23 @@
+[project]
+name = "housing-pipeline"
+version = "0.1.0"
+description = "Housing Pipeline Ireland: planning applications, property sales and parliamentary questions, joined up."
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.32",
+    "pandas>=2.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
