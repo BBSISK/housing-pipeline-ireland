@@ -69,8 +69,9 @@ explicitly as cp1252, and add a test that fails on any unmapped value.
 `ITMEasting` and `ITMNorthing` are blank on 100% of South Dublin records, and `LandUseCode` is 100%
 blank too. The data dictionary promises fields this council doesn't fill. The location does exist,
 but only in the map service's point geometry.
-*Fix:* request the geometry, projected to ITM (EPSG:2157), and use it when the columns are blank.
-Profile again and report how many applications have no location at all.
+*Fix (done, 10 Oct):* the downloader now requests the geometry projected to ITM (EPSG:2157) and
+uses it when the columns are blank. Re-profiled: **0 of 33,304 applications have no location, and
+0 fall outside Ireland's ITM bounds.** Found by profiling, not by reading the documentation.
 
 **2. The residential units field can't be trusted on its own.**
 `NumResidentialUnits` is blank on 67.4% of applications. It misses big schemes: `SD228/0001`
