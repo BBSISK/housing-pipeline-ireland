@@ -57,7 +57,56 @@ explicitly as cp1252, and add a test that fails on any unmapped value.
   control charts must allow for this lag, or every recent month will look "out of control".
 
 ## National Planning Applications — South Dublin County Council (HOUSE-9)
-_To do._
+
+**Pulled:** 10 Oct 2026 from the Department of Housing's ArcGIS feature service → `bronze/planning/2026-10-10/`
+**Size:** 33,304 applications received 1992 – 30 Sep 2026 (reliable from 1999; 7–21 a year before 1998).
+**Personal data:** applicant names and addresses are never requested, and a test fails if the service returns them.
+**Full profile:** [`planning-profile.md`](planning-profile.md)
+
+### Top 5 quality issues
+
+**1. The coordinate columns are empty.**
+`ITMEasting` and `ITMNorthing` are blank on 100% of South Dublin records, and `LandUseCode` is 100%
+blank too. The data dictionary promises fields this council doesn't fill. The location does exist,
+but only in the map service's point geometry.
+*Fix:* request the geometry, projected to ITM (EPSG:2157), and use it when the columns are blank.
+Profile again and report how many applications have no location at all.
+
+**2. The residential units field can't be trusted on its own.**
+`NumResidentialUnits` is blank on 67.4% of applications. It misses big schemes: `SD228/0001`
+describes 118 homes but has no units recorded. A keyword search is no better: 8,981 descriptions
+mention homes with no units recorded, but most are extensions to an existing "house", not new homes.
+*Fix:* this is exactly the case for LLM extraction (HOUSE-20): read the description, return new units
+and type, and score it against a hand-labelled test set. Use the field where present as a cross-check.
+
+**3. Not every "grant" is new housing.**
+Decisions are free text with 62 distinct values. They group cleanly (24,270 granted, 4,963 refused,
+1,626 invalid), but "granted" includes 370 extensions of duration, which re-grant an existing
+permission, and 1,845 retention permissions for work already built. 629 "Declared Exempt" are
+Section 5 declarations, not permissions at all.
+*Fix:* classify by application type *and* decision. Count a scheme's homes once: link extensions of
+duration back to the original application rather than counting them as new supply.
+
+**4. Big schemes may be decided elsewhere.**
+49 applications are "SHD3 – Application to ABP": large Strategic Housing Developments decided by
+An Bord Pleanála, not the council. These are exactly the big schemes that matter most, and the
+council record may not carry the final decision or unit count.
+*Fix:* flag SHD and LRD applications, check a sample against An Bord Pleanála's records, and treat
+their decision and units as needing confirmation.
+
+**5. Date logic errors and an unfinished picture.**
+20 applications were decided before they were received, 262 have a grant date after their expiry
+date, 35 have no received date, and one application number appears twice. About 2,500 applications
+have an in-progress status (officer allocation, registered, further information requested). Some
+are recent, some may be old records never updated, so check by received date.
+*Fix:* date-order validation rules that log failures with the rule that failed; never treat an
+in-progress application as refused; re-load weekly and track decisions as they change.
+
+### Also noted
+- **Eircode** (`DevelopmentPostcode`) is blank on 91.6% of applications, so it can't be used to join
+  planning to sales directly, which confirms the PPR finding.
+- **Applications per year** fell from about 1,980 in 2006–07 to about 670 in 2012, and have been
+  roughly 1,000–1,175 a year since 2019. That's the housing cycle visible in the data.
 
 ## Oireachtas housing PQs, last 30 days (HOUSE-10)
 _To do._
