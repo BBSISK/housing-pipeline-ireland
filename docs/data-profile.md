@@ -110,4 +110,47 @@ in-progress application as refused; re-load weekly and track decisions as they c
   roughly 1,000–1,175 a year since 2019. That's the housing cycle visible in the data.
 
 ## Oireachtas housing PQs, last 30 days (HOUSE-10)
-_To do._
+
+**Pulled:** 11 Oct 2026 from the Oireachtas API (open, no key) → `bronze/pqs/2026-10-11/`: every oral and
+written question plus the 176 members of the 34th Dáil (for constituencies).
+**Size:** 5,420 questions dated 16 Sep – 8 Oct 2026; **349 (6.4%) addressed to Housing**, 337 written and 12 oral.
+All 349 matched to a constituency, with no duplicates and no blank text.
+**Full profile:** [`pqs-profile.md`](pqs-profile.md)
+
+### Top 5 quality issues
+
+**1. The department is not the topic.**
+The API labels the department "Housing", but the full title is Housing, Local Government *and Heritage*.
+The sample includes questions about heritage tourism funding and onshore wind planning guidance, alongside
+real housing questions (Traveller accommodation, unspent development contributions, defective blocks).
+*Fix:* classify each question's topic (housing supply, social/affordable, planning, defects, heritage,
+other) with an LLM, score it against a hand-labelled set, and keep only housing topics downstream.
+
+**2. Geography is by constituency, not place, and the boundaries don't match councils.**
+No housing question in the window named a South Dublin place, yet Dublin Mid-West TDs asked 17. TDs
+represent constituencies, and constituency boundaries don't line up with council boundaries: South
+Dublin County Council is split across more than one constituency.
+*Fix:* a constituency-to-council overlap table, plus place extraction from the text, so a question can
+be tied to the pilot area either by who asked or by what it names.
+
+**3. Boilerplate in every question.**
+Every question starts with its order-paper number (`356.`) and ends with a PQ reference (`[66495/26]`).
+My first profile counted "questions containing a figure" as 349 of 349, which was meaningless: it was
+catching the boilerplate. Some questions also refer back to earlier ones ("further to Parliamentary
+Question Nos. PQ61112/26").
+*Fix (done):* strip the number and reference before analysing text, with tests. Keep the PQ reference
+as its own field, and use the "further to" references to link follow-up questions into threads.
+
+**4. Volume follows the Dáil calendar, not public interest.**
+Housing questions per week went 95 → 45 → 174 → 35. The window asked for 30 days but only contains
+16 Sep – 8 Oct: questions only exist on sitting days, and the newest appear a few days after they are
+asked.
+*Fix:* count per sitting week, not per calendar week, before putting PQ volume on a control chart, and
+treat the latest few days as incomplete (the same late-filing lag as the Property Price Register).
+
+**5. Redactions and concentration.**
+41 housing questions (12%) contain "(details supplied)": a person or property is removed, so those can't
+be tied to a place. Volume is also concentrated: the top three TDs asked 61 of 349 (17%), and one
+constituency (Dún Laoghaire) leads with 39.
+*Fix:* keep redacted questions but flag them as unlocatable; report "number of TDs asking" alongside raw
+counts, so one active TD doesn't look like a regional surge.
