@@ -1,8 +1,27 @@
-# Data profile — Sprint 1
+# Data profile — Sprint 1 (8–22 Oct 2026)
 
-One section per source: what was pulled, when, and the top 5 quality issues, each with
-evidence from the data and a proposed fix. The full generated numbers for each source
-are in their own profile file (e.g. `docs/ppr-profile.md`).
+Three public Irish sources, landed raw in `bronze/`, recorded in `bronze/manifest.csv` with SHA-256
+hashes, and profiled before anything is built on them. Dashboard: *Housing Pipeline Ireland*
+(Claude artifact, linked from the README).
+
+## Summary
+
+| Source | Rows | Covers | Biggest finding |
+|---|---|---|---|
+| Property Price Register (PSRA) | 810,390 sales | Jan 2010 – 2 Oct 2026, all counties | No Eircode on 68.8%; geography stops at county |
+| National Planning Applications (South Dublin) | 33,304 applications | 1992 – 30 Sep 2026 | Coordinate columns 100% blank; fixed via service geometry |
+| Oireachtas parliamentary questions | 5,420 questions (349 to Housing) | 16 Sep – 8 Oct 2026 | Department is not the topic; constituencies don't match councils |
+
+**15 quality issues** logged below (5 per source): **2 fixed** in Sprint 1, **10 planned** against
+existing stories, **3 need new stories** (PQ topic classification, constituency-to-council overlap,
+redaction handling).
+
+**What it means for the design**
+- Joining sources needs geocoding and coordinate conversion; neither Eircode nor council is reliable.
+- Official fields can't be trusted alone (units, decision): LLM extraction must be scored against
+  hand-labelled test sets.
+- All three sources file late, so the most recent weeks are incomplete; control charts must allow for it.
+- Personal data is excluded at download (planning applicants) and redactions are flagged (PQs).
 
 ## Property Price Register (HOUSE-8)
 

@@ -5,7 +5,24 @@
 A data pipeline that joins three public Irish data sources that were never designed to fit together,
 then exposes the result to AI agents through an MCP server.
 
-> Status: **Sprint 1 — ingestion foundations** (started 8 Oct 2026). Pilot area: South Dublin County Council.
+> Status: **Sprint 1 — ingestion foundations** (8–22 Oct 2026). Pilot area: South Dublin County Council.
+
+## Sprint 1 results
+
+| Source | Rows landed | Biggest finding |
+|---|---|---|
+| Property Price Register | 810,390 sales (2010 – Oct 2026) | No Eircode on 68.8%; geography stops at county |
+| Planning applications, South Dublin | 33,304 applications | Coordinate columns 100% blank; fixed via service geometry |
+| Oireachtas parliamentary questions | 5,420 (349 to Housing) | Department is not the topic; constituencies don't match councils |
+
+- **Data profile and 15 quality issues:** [`docs/data-profile.md`](docs/data-profile.md)
+- **Dashboard:** Housing Pipeline Ireland (Claude artifact) — link shared on request
+- **Lineage:** every raw file is in [`bronze/manifest.csv`](bronze/manifest.csv) with a SHA-256 hash and row count
+
+```
+python -m housing_pipeline.manifest status    # freshness per source
+python -m housing_pipeline.manifest verify    # raw files unchanged since landing
+```
 
 ## Sources
 
