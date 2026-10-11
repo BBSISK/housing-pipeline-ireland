@@ -201,19 +201,22 @@ def render_markdown(p: dict, source_file: str) -> str:
     return "\n".join(lines)
 
 
-def download(url: str = DOWNLOAD_URL) -> pathlib.Path:
+def download(url: str = DOWNLOAD_URL, force: bool = False) -> pathlib.Path:
     import requests
 
-    target_dir = BRONZE / dt.date.today().isoformat()
-    target_dir.mkdir(parents=True, exist_ok=True)
-    target = target_dir / "PPR-ALL.zip"
-    if target.exists():
-        print(f"Already downloaded today: {target}")
-        return target
+    from housing_pipeline import manifest
+
+    existing = manifest.today_dir(BRONZE)
+    if existing and not force:
+        print(f"Already downloaded today: {existing}")
+        return existing / "PPR-ALL.zip"
     response = requests.get(url, timeout=120)
     response.raise_for_status()
+    target_dir = manifest.run_dir(BRONZE)  # never an existing folder
+    target_dir.mkdir(parents=True)
+    target = target_dir / "PPR-ALL.zip"
     target.write_bytes(response.content)
-    print(f"Saved {len(response.content):,} bytes to {target}")
+    manifest.report_landing("ppr", url, target)
     return target
 
 
@@ -227,13 +230,14 @@ def newest_bronze_zip() -> pathlib.Path:
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
-    sub.add_parser("download")
+    dl = sub.add_parser("download")
+    dl.add_argument("--force", action="store_true", help="Download again into a new run folder")
     prof = sub.add_parser("profile")
     prof.add_argument("--file", type=pathlib.Path, help="Profile this ZIP instead of the newest bronze one")
     args = parser.parse_args(argv)
 
     if args.command == "download":
-        download()
+        download(force=args.force)
         return
 
     zip_path = args.file.expanduser() if args.file else newest_bronze_zip()

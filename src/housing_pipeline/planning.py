@@ -106,15 +106,18 @@ def with_geometry(feature: dict) -> dict:
 
 
 def download(force: bool = False) -> pathlib.Path:
-    target_dir = BRONZE / dt.date.today().isoformat()
-    target = target_dir / "south-dublin.json"
-    if target.exists() and not force:
-        print(f"Already downloaded today: {target}")
-        return target
+    from housing_pipeline import manifest
+
+    existing = manifest.today_dir(BRONZE)
+    if existing and not force:
+        print(f"Already downloaded today: {existing}")
+        return existing / "south-dublin.json"
     records = download_records()
-    target_dir.mkdir(parents=True, exist_ok=True)
+    target_dir = manifest.run_dir(BRONZE)  # never an existing folder
+    target_dir.mkdir(parents=True)
+    target = target_dir / "south-dublin.json"
     target.write_text(json.dumps(records), encoding="utf-8")
-    print(f"Saved {len(records):,} applications to {target}")
+    manifest.report_landing("planning", SERVICE, target)
     return target
 
 
@@ -290,7 +293,7 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
     dl = sub.add_parser("download")
-    dl.add_argument("--force", action="store_true", help="Download again even if today's file exists")
+    dl.add_argument("--force", action="store_true", help="Download again into a new run folder")
     prof = sub.add_parser("profile")
     prof.add_argument("--file", type=pathlib.Path, help="Profile this JSON file instead of the newest bronze one")
     args = parser.parse_args(argv)
