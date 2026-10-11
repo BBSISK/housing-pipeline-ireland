@@ -138,7 +138,8 @@ Every question starts with its order-paper number (`356.`) and ends with a PQ re
 My first profile counted "questions containing a figure" as 349 of 349, which was meaningless: it was
 catching the boilerplate. Some questions also refer back to earlier ones ("further to Parliamentary
 Question Nos. PQ61112/26").
-*Fix (done):* strip the number and reference before analysing text, with tests. Keep the PQ reference
+*Fix (done):* strip the number and reference before analysing text, with tests. Re-profiled: **119 of
+349 (34%)** contain a real figure (amounts, years, unit counts), which is the useful number. Keep the PQ reference
 as its own field, and use the "further to" references to link follow-up questions into threads.
 
 **4. Volume follows the Dáil calendar, not public interest.**
