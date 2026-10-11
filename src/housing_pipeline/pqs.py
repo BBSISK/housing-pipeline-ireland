@@ -84,18 +84,23 @@ def download_members(fetch: Callable[[str, dict], dict] = fetch_json) -> list[di
 
 
 def download(days: int = 30, force: bool = False) -> pathlib.Path:
+    from housing_pipeline import manifest
+
+    existing = manifest.today_dir(BRONZE)
+    if existing and not force:
+        print(f"Already downloaded today: {existing}")
+        return existing
     today = dt.date.today()
-    target_dir = BRONZE / today.isoformat()
-    questions_file = target_dir / "questions.json"
-    if questions_file.exists() and not force:
-        print(f"Already downloaded today: {questions_file}")
-        return target_dir
     questions = download_questions(today - dt.timedelta(days=days), today)
     members = download_members()
-    target_dir.mkdir(parents=True, exist_ok=True)
+    target_dir = manifest.run_dir(BRONZE)  # never an existing folder
+    target_dir.mkdir(parents=True)
+    questions_file = target_dir / "questions.json"
+    members_file = target_dir / "members.json"
     questions_file.write_text(json.dumps(questions), encoding="utf-8")
-    (target_dir / "members.json").write_text(json.dumps(members), encoding="utf-8")
-    print(f"Saved {len(questions):,} questions and {len(members)} members to {target_dir}")
+    members_file.write_text(json.dumps(members), encoding="utf-8")
+    manifest.report_landing("pqs", f"{API}/questions", questions_file)
+    manifest.report_landing("pqs", f"{API}/members", members_file)
     return target_dir
 
 
@@ -244,7 +249,7 @@ def main(argv: list[str] | None = None) -> None:
     sub = parser.add_subparsers(dest="command", required=True)
     dl = sub.add_parser("download")
     dl.add_argument("--days", type=int, default=30)
-    dl.add_argument("--force", action="store_true", help="Download again even if today's files exist")
+    dl.add_argument("--force", action="store_true", help="Download again into a new run folder")
     sub.add_parser("profile")
     args = parser.parse_args(argv)
 

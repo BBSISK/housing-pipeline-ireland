@@ -1,0 +1,5 @@
+landed_at_utc,source,url,file,bytes,sha256,rows
+2026-10-08T15:13:41Z,ppr,https://www.propertypriceregister.ie/,bronze/ppr/2026-10-08/PPR-ALL.zip,19176198,8fde7fe646cd1fccf70a5f8f18d9a88e5d3b4b05621d2afdfd8d17c84320c54e,810390
+2026-10-10T21:17:03Z,planning,https://data.gov.ie/dataset/national-planning-applications,bronze/planning/2026-10-10/south-dublin.json,41065164,74bca99fca3b18054a63429ed9838561ff40ec45103b4559e4423d3c625587fc,33304
+2026-10-11T22:19:37Z,pqs,https://api.oireachtas.ie/,bronze/pqs/2026-10-11/questions.json,6970977,e3770e425855c0ccbc4a473605050ce849679ad4e459ba1e318e63489924a725,5420
+2026-10-11T22:19:37Z,pqs,https://api.oireachtas.ie/,bronze/pqs/2026-10-11/members.json,720348,76a31377267edceb76bfda6ee7218fd7b9847b25b884951fdd7e4a9d86639213,176
