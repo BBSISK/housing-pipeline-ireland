@@ -1,0 +1,8 @@
+# Copy to terraform.tfvars (gitignored) and fill in.
+# Get the subscription ID with:  az account show --query id -o tsv
+
+subscription_id = "00000000-0000-0000-0000-000000000000"
+budget_emails   = ["you@example.com"]
+
+# If budget creation fails (some student/sponsored offers don't support budgets):
+# enable_budget = false
