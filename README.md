@@ -54,6 +54,26 @@ each with a measured confidence, and uncertain matches routed for review rather 
 8. **Agents** — Q&A agent grounded only in MCP tools; weekly housing brief
 9. **Evaluation** — answers checked against SQL ground truth
 
+## Azure infrastructure
+
+Terraform in [`infra/`](infra/) creates the resource group, a storage account with `bronze`, `silver`
+and `gold` containers, a data-plane role for the person running it, and a monthly budget alert.
+Region: North Europe (Dublin), so the data stays in Ireland.
+
+```
+cd infra
+cp terraform.tfvars.example terraform.tfvars    # fill in subscription ID and alert email
+terraform init
+terraform plan -out house13.tfplan
+terraform apply house13.tfplan
+cd ..
+python -m pip install -e ".[azure]"
+python -m housing_pipeline.cloud upload --account <storage_account output>
+```
+
+The upload is keyless (`az login`), skips blobs already there with the same hash, and refuses to
+overwrite a bronze blob with different content.
+
 ## Security
 
 Keyless from the first commit. No API keys or passwords anywhere:

@@ -25,6 +25,8 @@ local.settings.json
 *.tfstate
 *.tfstate.*
 *.tfplan
+*.tfvars
+!*.tfvars.example
 crash.log
 
 # OS / editor
